@@ -254,6 +254,48 @@ footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center;line-
 .sync[data-st="saving"]{background:var(--late)}
 .sync[data-st="offline"]{background:var(--abs)}
 .sync[data-st="noconf"]{background:var(--abs)}
+
+.teams{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:12px;padding:14px 18px}
+.team{border:1px solid var(--line);border-left:3px solid var(--tc);border-radius:11px;background:var(--surface2);
+  padding:11px 12px;display:flex;flex-direction:column;gap:9px}
+.team-h{display:flex;align-items:center;gap:8px}
+.team-h b{font-size:15px;letter-spacing:-.01em}
+.team-n{font-size:12px;color:var(--muted);font-family:var(--mono);margin-left:auto}
+.team-name{width:auto;flex:1;font-weight:600;padding:4px 8px}
+.chips2{display:flex;flex-wrap:wrap;gap:5px}
+.mchip{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;background:var(--surface);
+  border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.mchip button{color:var(--muted);font-size:14px;line-height:1}
+.mchip button:hover{color:var(--abs)}
+.muted-s{font-size:12.5px;color:var(--muted)}
+.assign{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--line);
+  border-radius:9px;padding:4px 9px}
+.assign b{font-size:12.5px;font-weight:600;white-space:nowrap}
+.assign select{width:auto;padding:3px 6px;font-size:12.5px}
+.lb2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-family:var(--mono)}
+.tf{align-items:center}
+.tpick{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tpick button{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:4px 12px;
+  color:var(--muted);background:var(--surface)}
+.tpick button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accentInk);font-weight:600}
+.rbadge{font-size:11px;font-weight:700;background:var(--lateSoft);color:var(--late);border-radius:5px;padding:2px 8px}
+.tres{padding:14px 18px;border-top:1px solid var(--lineSoft)}
+.tres-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.tres-h b{font-size:14.5px}
+.qgrid{display:flex;flex-wrap:wrap;gap:4px}
+.q{width:36px;height:31px;border:1px solid var(--line);border-radius:7px;font-family:var(--mono);
+  font-size:12.5px;font-weight:600;color:var(--ink2);background:var(--surface);font-variant-numeric:tabular-nums}
+.q:hover{border-color:var(--ink2)}
+.q.wrong{background:var(--absSoft);border-color:var(--abs);color:var(--abs)}
+.whos{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:11px}
+.who{display:inline-flex;align-items:center;gap:5px;background:var(--absSoft);border-radius:8px;padding:3px 7px}
+.who i{font-style:normal;font-family:var(--mono);font-weight:700;color:var(--abs);font-size:12.5px;min-width:16px;text-align:center}
+.who select{width:auto;padding:2px 5px;font-size:12px}
+.qchip{display:inline-flex;align-items:center;gap:6px;background:var(--absSoft);color:var(--abs);
+  border-radius:999px;padding:3px 11px;font-family:var(--mono);font-weight:700;font-size:12.5px}
+.qchip em{font-style:normal;font-family:var(--sans);font-weight:500;color:var(--ink2);font-size:12px}
+.qchip em.undec{color:var(--muted)}
+.allok{font-size:13px;color:var(--ok);background:var(--okSoft);border-radius:8px;padding:6px 12px;display:inline-block}
 </style>
 </head>
 <body>
@@ -795,7 +837,7 @@ const SEED = {
 var STAGES = [
   {id:"s1", label:"1단계 · 강의 수강 (8/10 ~ 9/9)"},
   {id:"s2", label:"2단계 · 문제 풀이 (9/10 ~ 9/23)"},
-  {id:"s3", label:"3단계 · 최종 정리 및 시험 (9/28 ~ 10월 초)"}
+  {id:"s3", label:"3단계 · 실전 문제 풀이 (9/28 ~ 10/21)"}
 ];
 /* 원 계획 대비 8/24 기준 1회분 조정 — mv:true 는 조정으로 밀린 회차 */
 var BASE = [
@@ -836,7 +878,22 @@ var BASE = [
   {d:"2026-09-25",w:"7주차",st:"s2",k:"off",t:"추석 연휴 — 개인 실전 모의고사 기간 (점수 공유 의무)",h:"",n:"휴무"},
   {d:"2026-09-28",w:"8주차",st:"s3",k:"final",t:"연휴 모의고사 오답 리뷰 · Tutorials Dojo 치트시트 정리",h:"1~2시간",n:""},
   {d:"2026-09-29",w:"8주차",st:"s3",k:"final",t:"비교 개념 최종 정리 · 취약 도메인 집중 보완",h:"1~2시간",n:"보안 30% / 복원력 26%"},
-  {d:"2026-09-30",w:"8주차",st:"s3",k:"final",t:"최종 점검 · 응시 기준(정답률 80%) 확인",h:"1~2시간",n:"고성능 24% / 비용 20%"}
+  {d:"2026-09-30",w:"8주차",st:"s3",k:"final",t:"최종 점검 · 응시 기준(정답률 80%) 확인",h:"1~2시간",n:"고성능 24% / 비용 20%"},
+  {d:"2026-10-01",w:"8주차",st:"s3",k:"final",t:"ExamTopics 실전 문제 풀이 · 팀별 오답 해설",h:"1~2시간",n:""},
+  {d:"2026-10-02",w:"8주차",st:"s3",k:"final",t:"주간 오답 재풀이 · 취약 도메인 점검",h:"1~2시간",n:""},
+  {d:"2026-10-05",w:"9주차",st:"s3",k:"off",t:"개천절 대체공휴일",h:"",n:"휴무"},
+  {d:"2026-10-06",w:"9주차",st:"s3",k:"final",t:"ExamTopics 실전 문제 풀이 · 팀별 오답 해설",h:"1~2시간",n:""},
+  {d:"2026-10-07",w:"9주차",st:"s3",k:"final",t:"ExamTopics 실전 문제 풀이 · 팀별 오답 해설",h:"1~2시간",n:""},
+  {d:"2026-10-08",w:"9주차",st:"s3",k:"final",t:"ExamTopics 실전 문제 풀이 · 팀별 오답 해설",h:"1~2시간",n:""},
+  {d:"2026-10-09",w:"9주차",st:"s3",k:"off",t:"한글날",h:"",n:"휴무"},
+  {d:"2026-10-12",w:"10주차",st:"s3",k:"final",t:"ExamTopics 실전 문제 풀이 · 팀별 오답 해설",h:"1~2시간",n:""},
+  {d:"2026-10-13",w:"10주차",st:"s3",k:"final",t:"ExamTopics 실전 문제 풀이 · 팀별 오답 해설",h:"1~2시간",n:""},
+  {d:"2026-10-14",w:"10주차",st:"s3",k:"final",t:"ExamTopics 실전 문제 풀이 · 팀별 오답 해설",h:"1~2시간",n:""},
+  {d:"2026-10-15",w:"10주차",st:"s3",k:"final",t:"ExamTopics 실전 문제 풀이 · 팀별 오답 해설",h:"1~2시간",n:""},
+  {d:"2026-10-16",w:"10주차",st:"s3",k:"final",t:"주간 오답 재풀이 · 취약 도메인 점검",h:"1~2시간",n:""},
+  {d:"2026-10-19",w:"11주차",st:"s3",k:"final",t:"ExamTopics 실전 문제 풀이 · 팀별 오답 해설",h:"1~2시간",n:""},
+  {d:"2026-10-20",w:"11주차",st:"s3",k:"final",t:"ExamTopics 실전 문제 풀이 · 팀별 오답 해설",h:"1~2시간",n:""},
+  {d:"2026-10-21",w:"11주차",st:"s3",k:"final",t:"최종 점검 · 오답 총정리",h:"1~2시간",n:"마지막 회차"}
 ];
 
 var ST = {
@@ -860,11 +917,21 @@ function normalize(){
   if(!S.over) S.over={};
   if(!S.members) S.members=[];
   S.members.forEach(function(m){ if(!m.regDays) m.regDays=[]; if(m.regReason==null) m.regReason=""; });
+  if(!S.teams) S.teams=[];
+  if(!S.tasks) S.tasks=[];
+  if(S.seqG==null) S.seqG=0;
+  if(S.seqT==null) S.seqT=0;
+  S.teams.forEach(function(g){ if(!g.members) g.members=[]; if(g.name==null) g.name=""; });
+  S.tasks.forEach(function(t){
+    if(!t.nums) t.nums=[]; if(!t.teamIds) t.teamIds=[]; if(!t.res) t.res={};
+    if(!t.round) t.round=1;
+    for(var k in t.res){ var r=t.res[k]; if(!r.wrong) r.wrong=[]; if(!r.who) r.who={}; }
+  });
 }
 normalize();
 
 var SCHED = applyOver();
-var page="dash", editMode=false, dirty=false, readOnly=false, editRow=null;
+var page="dash", editMode=false, dirty=false, readOnly=false, editRow=null, taskForm=false;
 var changes={};
 var UIK="saa-board-ui";
 function mark(k){ changes[k]=1; dirty=true; }
@@ -1009,6 +1076,7 @@ function topBar(){
    +'<div class="tabs" role="tablist">'
      +'<button role="tab" aria-selected="'+(page==="dash")+'" data-page="dash">대시보드</button>'
      +'<button role="tab" aria-selected="'+(page==="sheet")+'" data-page="sheet">출석표 &amp; 일정표</button>'
+     +'<button role="tab" aria-selected="'+(page==="task")+'" data-page="task">과제 &amp; 팀</button>'
    +'</div><div class="tools">'
      +(readOnly?'<span style="font-size:12.5px;color:var(--muted)">보기 전용</span>'
         :'<button class="btn'+(editMode?" on":"")+'" id="editBtn">'+(editMode?"편집 중":"편집")+'</button>'
@@ -1382,7 +1450,9 @@ function render(){
   var h=topBar()+'<div class="wrap">';
   if(page==="dash"){
     h+='<div class="grid-main"><div>'+todayCard()+'</div>'
-      +'<div class="rail">'+noticeCard()+regCard()+goalCard()+'</div></div>'+weekCard();
+      +'<div class="rail">'+todayTaskCard()+noticeCard()+regCard()+goalCard()+'</div></div>'+weekCard();
+  }else if(page==="task"){
+    h+=teamCard()+taskSection();
   }else{
     h+=attTable()+dowTable()+schedTable();
   }
@@ -1402,6 +1472,20 @@ document.addEventListener("click",function(ev){
   if(ev.target.closest("#inBtn")){signIn();return;}
   if(ev.target.closest("#outBtn")){signOutNow();return;}
   if(ev.target.closest("#seedBtn")){seedUpload();return;}
+  if(ev.target.closest("#addTeam")){addTeam();return;}
+  if((el=ev.target.closest('[data-act="tdel"]'))){delTeam(el.getAttribute("data-id"));return;}
+  if((el=ev.target.closest('[data-act="tout"]'))){teamOut(el.getAttribute("data-id"),el.getAttribute("data-m"));return;}
+  if(ev.target.closest("#newTask")){taskForm=!taskForm;render();return;}
+  if(ev.target.closest("#tkCancel")){taskForm=false;render();return;}
+  if(ev.target.closest("#tkAdd")){addTask();return;}
+  if((el=ev.target.closest('[data-act="tkteam"]'))){
+    el.setAttribute("aria-pressed", el.getAttribute("aria-pressed")==="true"?"false":"true"); return;}
+  if((el=ev.target.closest('[data-act="qtog"]'))){
+    qtog(el.getAttribute("data-t"),el.getAttribute("data-g"),el.getAttribute("data-n"));return;}
+  if((el=ev.target.closest('[data-act="retry"]'))){retry(el.getAttribute("data-t"),el.getAttribute("data-g"));return;}
+  if((el=ev.target.closest('[data-act="retryall"]'))){retry(el.getAttribute("data-t"),null);return;}
+  if((el=ev.target.closest('[data-act="taskdel"]'))){delTask(el.getAttribute("data-id"));return;}
+  if((el=ev.target.closest('[data-act="gotask"]'))){page="task";render();window.scrollTo(0,0);return;}
   if((el=ev.target.closest('[data-act="st"]'))){setStat(cur,el.getAttribute("data-id"),el.getAttribute("data-v"));return;}
   if((el=ev.target.closest('[data-act="peek"]'))){toast(el.getAttribute("data-txt"),5200);return;}
   if((el=ev.target.closest('[data-act="preset"]'))){
@@ -1439,9 +1523,20 @@ document.addEventListener("click",function(ev){
 });
 document.addEventListener("input",function(ev){
   var el=ev.target.closest('[data-act="memo"]');
-  if(el) setMemo(cur,el.getAttribute("data-id"),el.value);
+  if(el){ setMemo(cur,el.getAttribute("data-id"),el.value); return; }
+  el=ev.target.closest('[data-act="tname"]');
+  if(el){ var g=teamById(el.getAttribute("data-id")); if(g){ g.name=el.value; mark("team:"+g.id); syncSaveBtn(); } }
 });
 document.addEventListener("change",function(ev){
+  if(ev.target.matches('[data-act="tin"]')){
+    if(ev.target.value) teamIn(ev.target.getAttribute("data-m"), ev.target.value);
+    return;
+  }
+  if(ev.target.matches('[data-act="qwho"]')){
+    setWho(ev.target.getAttribute("data-t"),ev.target.getAttribute("data-g"),
+           ev.target.getAttribute("data-n"),ev.target.value);
+    return;
+  }
   if(ev.target.id==="chgMember"){
     var nm=document.getElementById("chgName");
     if(nm) nm.style.display=(ev.target.value==="__new")?"":"none";
@@ -1525,6 +1620,280 @@ function pushNext(d){
   S.over[d]={k:"off",t:"일정 없음 (다음 회차로 이월)",h:"",n:"이월"};
   SCHED=applyOver(); editRow=null; mark("sched:"+d); mark("sched:"+nx.d); render();
   toast(fmtShort(d)+" 내용을 "+fmtShort(nx.d)+"로 이월했습니다.");
+}
+
+
+/* ================= 팀 ================= */
+function mById(id){ for(var i=0;i<S.members.length;i++) if(S.members[i].id===id) return S.members[i]; return null; }
+function mName(id){ var m=mById(id); return m ? m.name+(m.tag?"("+m.tag+")":"") : "?"; }
+function teamById(id){ for(var i=0;i<S.teams.length;i++) if(S.teams[i].id===id) return S.teams[i]; return null; }
+function teamOf(mid){ for(var i=0;i<S.teams.length;i++) if(S.teams[i].members.indexOf(mid)>=0) return S.teams[i]; return null; }
+function teamColor(i){
+  var c=["var(--accent)","var(--reg)","var(--ok)","var(--late)","var(--exc)","var(--sick)"];
+  return c[i%c.length];
+}
+function roster(){ var t=todayISO(); return S.members.filter(function(m){ return isMember(m,t); }); }
+
+function addTeam(){
+  S.seqG=(S.seqG||0)+1;
+  var g={id:"g"+S.seqG, name:"팀 "+(S.teams.length+1), members:[]};
+  S.teams.push(g); mark("team:"+g.id); render();
+}
+function delTeam(id){
+  var g=teamById(id); if(!g) return;
+  S.teams=S.teams.filter(function(x){return x.id!==id;});
+  mark("team:"+id); render();
+  toast(g.name+" 해체. 소속 인원은 미배정으로 돌아갑니다.");
+}
+function teamIn(mid,gid){
+  S.teams.forEach(function(g){ g.members=g.members.filter(function(x){return x!==mid;}); });
+  var g=teamById(gid); if(!g) return;
+  g.members.push(mid); mark("team:"+gid); render();
+}
+function teamOut(gid,mid){
+  var g=teamById(gid); if(!g) return;
+  g.members=g.members.filter(function(x){return x!==mid;});
+  mark("team:"+gid); render();
+}
+
+function teamCard(){
+  var un=roster().filter(function(m){ return !teamOf(m.id); });
+  var h='<section class="card sec"><div class="card-h"><h2>팀 편성</h2>'
+    +'<span class="rest">'+S.teams.length+'개 팀 · 미배정 '+un.length+'명</span>'
+    +(editMode&&!readOnly?'<button class="btn sm" id="addTeam">+ 팀 추가</button>':"")+'</div>';
+  if(!S.teams.length){
+    h+='<div class="empty-note">아직 팀이 없습니다.<br>'
+      +(editMode&&!readOnly?'“+ 팀 추가”로 팀을 만들고 아래에서 인원을 배정하세요.'
+                           :'편집을 켜면 팀을 만들 수 있습니다.')+'</div>';
+  }else{
+    h+='<div class="teams">';
+    S.teams.forEach(function(g,i){
+      h+='<div class="team" style="--tc:'+teamColor(i)+'"><div class="team-h">'
+        +(editMode&&!readOnly
+          ? '<input class="f team-name" data-act="tname" data-id="'+g.id+'" value="'+esc(g.name)+'">'
+            +'<button class="btn sm" data-act="tdel" data-id="'+g.id+'">해체</button>'
+          : '<b>'+esc(g.name)+'</b><span class="team-n">'+g.members.length+'명</span>')
+        +'</div><div class="chips2">';
+      if(!g.members.length) h+='<span class="muted-s">인원 없음</span>';
+      g.members.forEach(function(mid){
+        h+='<span class="mchip">'+esc(mName(mid))
+          +(editMode&&!readOnly?'<button data-act="tout" data-id="'+g.id+'" data-m="'+mid+'" title="팀에서 빼기">&times;</button>':"")
+          +'</span>';
+      });
+      h+='</div></div>';
+    });
+    h+='</div>';
+  }
+  if(editMode&&!readOnly&&S.teams.length){
+    h+='<div class="frow"><label style="width:100%">미배정 인원 배정</label>';
+    if(!un.length) h+='<span class="muted-s">전원 배정 완료</span>';
+    un.forEach(function(m){
+      h+='<span class="assign"><b>'+esc(m.name)+(m.tag?" ("+esc(m.tag)+")":"")+'</b>'
+        +'<select class="f" data-act="tin" data-m="'+m.id+'"><option value="">팀 선택</option>'
+        +S.teams.map(function(g){return '<option value="'+g.id+'">'+esc(g.name)+'</option>';}).join("")
+        +'</select></span>';
+    });
+    h+='</div>';
+  }
+  return h+'</section>';
+}
+
+/* ================= 과제 ================= */
+function taskById(id){ for(var i=0;i<S.tasks.length;i++) if(S.tasks[i].id===id) return S.tasks[i]; return null; }
+function parseNums(str){
+  var out=[], seen={};
+  String(str||"").split(/[,\s]+/).forEach(function(tok){
+    if(!tok) return;
+    var m=tok.match(/^(\d+)[-~](\d+)$/);
+    if(m){
+      var a=+m[1], b=+m[2]; if(a>b){ var t=a; a=b; b=t; }
+      if(b-a>300) b=a+300;
+      for(var i=a;i<=b;i++) if(!seen[i]){ seen[i]=1; out.push(String(i)); }
+    }else if(/^\d+$/.test(tok)){
+      if(!seen[tok]){ seen[tok]=1; out.push(tok); }
+    }
+  });
+  return out.sort(function(x,y){ return (+x)-(+y); });
+}
+function dayOpts(sel){
+  return SCHED.filter(function(e){ return e.k!=="off"; }).map(function(e){
+    return '<option value="'+e.d+'"'+(e.d===sel?" selected":"")+'>'+fmtShort(e.d)+' ('+dowOf(e.d)+')</option>';
+  }).join("");
+}
+function targetsOf(t){
+  return (t.teamIds.length? t.teamIds.map(teamById) : S.teams.slice()).filter(Boolean);
+}
+function resOf(t,gid){
+  if(!t.res[gid]) t.res[gid]={wrong:[],who:{},note:""};
+  return t.res[gid];
+}
+
+function addTask(){
+  if(!S.teams.length){ toast("팀을 먼저 만들어 주세요."); return; }
+  var nums=parseNums(document.getElementById("tkNums").value);
+  if(!nums.length){ toast("문제 번호를 입력하세요. 예: 1-40"); return; }
+  var ids=[];
+  [].forEach.call(document.querySelectorAll('#tkTeams [data-act="tkteam"]'),function(b){
+    if(b.getAttribute("aria-pressed")==="true") ids.push(b.getAttribute("data-id"));
+  });
+  if(!ids.length){ toast("대상 팀을 하나 이상 고르세요."); return; }
+  var title=document.getElementById("tkTitle").value.trim();
+  S.seqT=(S.seqT||0)+1;
+  var t={ id:"k"+S.seqT,
+          title: title || ("문제 "+nums[0]+"~"+nums[nums.length-1]),
+          src: document.getElementById("tkSrc").value.trim(),
+          date: document.getElementById("tkDate").value,
+          due: document.getElementById("tkDue").value,
+          nums: nums, teamIds: ids, parent:"", round:1, res:{} };
+  ids.forEach(function(g){ t.res[g]={wrong:[],who:{},note:""}; });
+  S.tasks.push(t);
+  taskForm=false; mark("task:"+t.id); render();
+  toast("과제를 출제했습니다. 저장하기를 눌러 전원에게 반영하세요.");
+}
+function delTask(id){
+  var t=taskById(id); if(!t) return;
+  S.tasks=S.tasks.filter(function(x){return x.id!==id;});
+  mark("task:"+id); render();
+  toast("“"+t.title+"” 과제를 삭제했습니다.");
+}
+function qtog(tid,gid,n){
+  var t=taskById(tid); if(!t) return;
+  var r=resOf(t,gid), i=r.wrong.indexOf(n);
+  if(i>=0){ r.wrong.splice(i,1); delete r.who[n]; }
+  else { r.wrong.push(n); r.wrong.sort(function(a,b){return (+a)-(+b);}); }
+  mark("res:"+tid+":"+gid); render();
+}
+function setWho(tid,gid,n,mid){
+  var t=taskById(tid); if(!t) return;
+  var r=resOf(t,gid);
+  if(mid) r.who[n]=mid; else delete r.who[n];
+  mark("res:"+tid+":"+gid); syncSaveBtn();
+}
+function retry(tid,gid){
+  var t=taskById(tid); if(!t) return;
+  var gs = gid ? [gid] : targetsOf(t).map(function(g){return g.id;});
+  var union=[], seen={};
+  gs.forEach(function(g){
+    var r=t.res[g]; if(!r) return;
+    r.wrong.forEach(function(n){ if(!seen[n]){ seen[n]=1; union.push(n); } });
+  });
+  if(!union.length){ toast("재출제할 오답이 없습니다."); return; }
+  union.sort(function(a,b){ return (+a)-(+b); });
+  S.seqT=(S.seqT||0)+1;
+  var round=(t.round||1)+1;
+  var gname = gid ? (teamById(gid)?teamById(gid).name:"") : "";
+  var nt={ id:"k"+S.seqT, title:t.title+" — "+round+"차 오답"+(gname?" ("+gname+")":""), src:t.src,
+           date:cur, due:"", nums:union, teamIds:gs, parent:t.id, round:round, res:{} };
+  gs.forEach(function(g){ nt.res[g]={wrong:[],who:{},note:""}; });
+  S.tasks.push(nt);
+  mark("task:"+nt.id); render(); window.scrollTo(0,0);
+  toast(union.length+"문제로 "+round+"차 오답 과제를 만들었습니다.");
+}
+
+function taskFormHTML(){
+  return '<div class="frow tf"><label style="width:100%">새 과제 출제</label>'
+   +'<input class="f" id="tkTitle" placeholder="제목 — 예: ExamTopics 1~40" style="flex:2;min-width:190px;width:auto">'
+   +'<input class="f" id="tkSrc" placeholder="출처 (ExamTopics 등)" style="flex:1;min-width:140px;width:auto">'
+   +'<input class="f" id="tkNums" placeholder="문제 번호 — 1-40, 45, 50-55" style="flex:1.4;min-width:170px;width:auto">'
+   +'<span class="assign"><b>출제</b><select class="f" id="tkDate">'+dayOpts(cur)+'</select></span>'
+   +'<span class="assign"><b>마감</b><select class="f" id="tkDue">'
+     +'<option value="">없음</option>'+dayOpts("")+'</select></span>'
+   +'<div class="tpick" id="tkTeams"><span class="lb2">대상 팀</span>'
+     +(S.teams.length
+        ? S.teams.map(function(g){ return '<button data-act="tkteam" data-id="'+g.id+'" aria-pressed="true">'+esc(g.name)+'</button>'; }).join("")
+        : '<span class="muted-s">팀을 먼저 만드세요</span>')
+   +'</div>'
+   +'<button class="btn save" id="tkAdd">출제</button>'
+   +'<button class="btn sm" id="tkCancel">취소</button></div>';
+}
+
+function taskCard(t){
+  var targets=targetsOf(t);
+  var h='<section class="card sec"><div class="card-h"><h2>'+esc(t.title)+'</h2>'
+    +(t.round>1?'<span class="rbadge">'+t.round+'차 오답</span>':"")
+    +'<span class="rest">'+fmtShort(t.date)+' 출제 · '+t.nums.length+'문제'
+      +(t.src?' · '+esc(t.src):"")+(t.due?' · 마감 '+fmtShort(t.due)+'('+dowOf(t.due)+')':"")+'</span>'
+    +(editMode&&!readOnly?'<button class="btn sm" data-act="taskdel" data-id="'+t.id+'">삭제</button>':"")
+    +'</div>';
+  if(!targets.length){ return h+'<div class="empty-note">배정된 팀이 없습니다. (팀이 해체되었을 수 있습니다)</div></section>'; }
+  targets.forEach(function(g){
+    var r=t.res[g.id]||{wrong:[],who:{}};
+    var wrong=r.wrong||[], who=r.who||{};
+    var rate=t.nums.length? Math.round((t.nums.length-wrong.length)/t.nums.length*100):null;
+    h+='<div class="tres"><div class="tres-h"><b>'+esc(g.name)+'</b>'
+      +'<span class="muted-s">'+(g.members.length?g.members.map(mName).join(", "):"인원 없음")+'</span>'
+      +'<span class="rate '+rateClass(rate)+'" style="margin-left:auto">'+(rate===null?"–":rate+"%")+'</span>'
+      +'<span class="muted-s">오답 '+wrong.length+'</span></div>';
+    if(editMode&&!readOnly){
+      h+='<div class="qgrid">'+t.nums.map(function(n){
+        return '<button class="q'+(wrong.indexOf(n)>=0?" wrong":"")+'" data-act="qtog" data-t="'+t.id
+          +'" data-g="'+g.id+'" data-n="'+n+'">'+n+'</button>';
+      }).join("")+'</div>';
+      if(wrong.length){
+        h+='<div class="whos"><span class="lb2">해설 담당</span>'+wrong.map(function(n){
+          return '<span class="who"><i>'+n+'</i><select class="f" data-act="qwho" data-t="'+t.id
+            +'" data-g="'+g.id+'" data-n="'+n+'"><option value="">미정</option>'
+            +roster().map(function(m){
+               return '<option value="'+m.id+'"'+(who[n]===m.id?" selected":"")+'>'+esc(m.name)+(m.tag?"("+esc(m.tag)+")":"")+'</option>';
+             }).join("")+'</select></span>';
+        }).join("")+'</div>'
+        +'<div class="frow" style="border:none;padding:10px 0 0">'
+        +'<button class="btn sm" data-act="retry" data-t="'+t.id+'" data-g="'+g.id+'">이 팀 오답만 재출제</button></div>';
+      }
+    }else{
+      if(!wrong.length){
+        h+='<div class="allok">'+(t.nums.length?"오답 없음":"문제 없음")+'</div>';
+      }else{
+        h+='<div class="chips2">'+wrong.map(function(n){
+          return '<span class="qchip">'+n+(who[n]?'<em>'+esc(mName(who[n]))+'</em>':'<em class="undec">담당 미정</em>')+'</span>';
+        }).join("")+'</div>';
+      }
+    }
+    h+='</div>';
+  });
+  if(editMode&&!readOnly){
+    var any=targets.some(function(g){ var r=t.res[g.id]; return r&&r.wrong&&r.wrong.length; });
+    if(any) h+='<div class="frow"><button class="btn" data-act="retryall" data-t="'+t.id+'">전체 팀 오답 모아 재출제</button>'
+      +'<span class="muted-s">팀별 오답을 합쳐 새 과제를 만듭니다</span></div>';
+  }
+  return h+'</section>';
+}
+
+function taskSection(){
+  var h='<section class="card sec"><div class="card-h"><h2>과제 · 문제 풀이</h2>'
+    +'<span class="rest">'+S.tasks.length+'건 출제됨</span>'
+    +(editMode&&!readOnly?'<button class="btn sm" id="newTask">'+(taskForm?"닫기":"+ 과제 출제")+'</button>':"")+'</div>';
+  if(editMode&&!readOnly&&taskForm) h+=taskFormHTML();
+  if(!S.tasks.length){
+    h+='<div class="empty-note">출제된 과제가 없습니다.<br>'
+      +(editMode&&!readOnly?'“+ 과제 출제”로 문제 범위와 대상 팀을 정하세요.'
+                           :'편집을 켜면 과제를 출제할 수 있습니다.')+'</div>';
+  }
+  h+='</section>';
+  S.tasks.slice().sort(function(a,b){
+    return (b.date||"").localeCompare(a.date||"") || ((+b.id.slice(1))-(+a.id.slice(1)));
+  }).forEach(function(t){ h+=taskCard(t); });
+  return h;
+}
+
+function todayTaskCard(){
+  var list=S.tasks.filter(function(t){ return t.date===cur || t.due===cur; });
+  if(!list.length) return "";
+  var h='<section class="card"><div class="card-h"><h2>오늘의 과제</h2>'
+    +'<span class="rest">'+fmtShort(cur)+'</span></div><div class="nlist">';
+  list.forEach(function(t){
+    var targets=targetsOf(t);
+    var wrong=0; targets.forEach(function(g){ var r=t.res[g.id]; if(r&&r.wrong) wrong+=r.wrong.length; });
+    h+='<div class="nitem" data-act="gotask" style="cursor:pointer"><div style="padding:10px 12px">'
+      +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+      +'<span class="ntag '+(t.due===cur?"warn":"soon")+'">'+(t.due===cur?"마감":"출제")+'</span>'
+      +'<span class="nname">'+esc(t.title)+'</span></div>'
+      +'<div class="muted-s" style="margin-top:5px">'+t.nums.length+'문제 · '
+      +targets.map(function(g){return esc(g.name);}).join(", ")
+      +(wrong?' · <span style="color:var(--abs)">오답 '+wrong+'</span>':"")+'</div>'
+      +'</div></div>';
+  });
+  return h+'</div></section>';
 }
 
 /* ---------- Firebase 연동 ---------- */
