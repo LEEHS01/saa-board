@@ -317,6 +317,9 @@ const FIREBASE_CONFIG = {
 };
 
 /* ==== 2. 최초 1회 업로드용 초기 데이터 (이후에는 Firestore가 원본) ==== */
+/* 아티팩트(구 상황판)에 남아 있던 8/10~8/27 기록 — 한 번만 복구용 */
+const RECOVER = {"2026-08-10":{"m1":{"s":"present","m":""},"m5":{"s":"present","m":""},"m9":{"s":"present","m":""},"m6":{"s":"present","m":""},"m2":{"s":"present","m":""},"m3":{"s":"present","m":""},"m7":{"s":"present","m":""},"m4":{"s":"present","m":""},"m8":{"s":"present","m":""}},"2026-08-11":{"m1":{"s":"present","m":""},"m5":{"s":"present","m":""},"m9":{"s":"present","m":""},"m6":{"s":"present","m":""},"m2":{"s":"present","m":""},"m3":{"s":"present","m":""},"m7":{"s":"present","m":""},"m4":{"s":"present","m":""},"m8":{"s":"present","m":""}},"2026-08-12":{"m1":{"s":"present","m":""},"m5":{"s":"present","m":""},"m9":{"s":"present","m":""},"m7":{"s":"present","m":""},"m3":{"s":"present","m":""},"m6":{"s":"present","m":""},"m4":{"s":"present","m":""},"m8":{"s":"present","m":""},"m2":{"s":"excused","m":"개인사정"}},"2026-08-13":{"m1":{"s":"present","m":""},"m5":{"s":"present","m":""},"m9":{"s":"present","m":""},"m6":{"s":"present","m":""},"m2":{"s":"present","m":""},"m3":{"s":"present","m":""},"m7":{"s":"present","m":""},"m8":{"s":"present","m":""},"m4":{"s":"present","m":""}},"2026-08-14":{"m4":{"s":"present","m":""},"m8":{"s":"present","m":""},"m5":{"s":"present","m":""},"m1":{"s":"present","m":""},"m2":{"s":"present","m":""},"m6":{"s":"present","m":""},"m7":{"s":"present","m":""},"m3":{"s":"present","m":""},"m9":{"s":"excused","m":"정규교육 일정"}},"2026-08-18":{"m1":{"s":"present","m":""},"m5":{"s":"present","m":""},"m2":{"s":"present","m":""},"m6":{"s":"present","m":""},"m3":{"s":"excused","m":"개인 사정"},"m7":{"s":"present","m":""},"m4":{"s":"present","m":""},"m8":{"s":"present","m":""}},"2026-08-19":{"m1":{"s":"present","m":""},"m5":{"s":"present","m":""},"m6":{"s":"absent","m":"늦잠"},"m7":{"s":"present","m":""},"m3":{"s":"present","m":""},"m4":{"s":"present","m":""},"m8":{"s":"present","m":""},"m2":{"s":"excused","m":"개인사정"}},"2026-08-20":{"m1":{"s":"present","m":""},"m5":{"s":"present","m":""},"m2":{"s":"present","m":""},"m6":{"s":"present","m":""},"m4":{"s":"present","m":""},"m8":{"s":"present","m":""},"m7":{"s":"present","m":""},"m3":{"s":"present","m":""}},"2026-08-21":{"m6":{"s":"present","m":"개인 사정"},"m5":{"s":"present","m":""},"m1":{"s":"present","m":""},"m4":{"s":"present","m":""},"m8":{"s":"present","m":""},"m7":{"s":"excused","m":"정규교육 일정"},"m2":{"s":"present","m":""},"m3":{"s":"present","m":""}},"2026-08-24":{"m4":{"s":"present","m":""},"m3":{"s":"excused","m":"개인 사정"},"m2":{"s":"excused","m":"병원 진료"},"m1":{"s":"present","m":""},"m5":{"s":"present","m":""},"m6":{"s":"late","m":"개인 사정"},"m7":{"s":"excused","m":"병원 진료"},"m8":{"s":"present","m":""}},"2026-08-25":{"m1":{"s":"present","m":""},"m5":{"s":"present","m":""},"m2":{"s":"present","m":""},"m6":{"s":"present","m":""},"m3":{"s":"excused","m":"개인 사정"},"m7":{"s":"present","m":""},"m4":{"s":"present","m":""},"m8":{"s":"present","m":""}},"2026-08-26":{"m1":{"s":"present","m":""},"m5":{"s":"excused","m":"장학활동으로 인한 결석"},"m6":{"s":"present","m":""},"m3":{"s":"present","m":""},"m7":{"s":"present","m":""},"m4":{"s":"present","m":""},"m8":{"s":"present","m":""},"m2":{"s":"excused","m":"개인사정"}},"2026-08-27":{"m1":{"s":"present","m":""},"m3":{"s":"present","m":""},"m8":{"s":"present","m":""},"m7":{"s":"present","m":""},"m5":{"s":"present","m":""},"m2":{"s":"present","m":""},"m4":{"s":"present","m":""}}};
+
 const SEED = {
  "meta": {
   "title": "AWS SAA-C03 스터디",
@@ -1079,8 +1082,10 @@ function topBar(){
      +'<button role="tab" aria-selected="'+(page==="task")+'" data-page="task">과제 &amp; 팀</button>'
    +'</div><div class="tools">'
      +(readOnly?'<span style="font-size:12.5px;color:var(--muted)">보기 전용</span>'
-        :'<button class="btn'+(editMode?" on":"")+'" id="editBtn">'+(editMode?"편집 중":"편집")+'</button>'
-         +(editMode?'<button class="btn save" id="saveBtn"'+(dirty?"":" disabled")+'>'+saveLabel()+'</button>':""))
+        :(!loaded&&syncSt!=="noconf"
+           ?'<span style="font-size:12.5px;color:var(--muted)">불러오는 중…</span>'
+           :'<button class="btn'+(editMode?" on":"")+'" id="editBtn">'+(editMode?"편집 중":"편집")+'</button>'
+            +(editMode?'<button class="btn save" id="saveBtn"'+(dirty?"":" disabled")+'>'+saveLabel()+'</button>':"")))
    +'<span class="sync" data-st="'+syncSt+'" title="'+esc(syncTitle())+'"></span>'
      +(needSeed&&user?'<button class="btn" id="seedBtn">초기 데이터 올리기</button>':"")
      +authBtn()
@@ -1322,7 +1327,9 @@ function weekCard(){
 function attTable(){
   var t=todayISO();
   var days=SCHED.filter(function(e){return e.k!=="off";});
+  var rd = (editMode&&!readOnly) ? recoverDiff() : 0;
   var h='<section class="card sec"><div class="card-h"><h2>출석표 — 전체 회차</h2>'
+    +(rd?'<button class="btn sm" id="recBtn" style="border-color:var(--late);color:var(--late)">이전 상황판 기록 '+rd+'건 복구</button>':"")
     +'<span class="rest">점이 찍힌 칸은 사유 있음 (클릭) · 보라 테두리는 정기 불참 요일</span></div>';
   h+='<div class="scroll" style="max-height:58vh"><table><thead><tr><th class="nm">인원</th>'
     +days.map(function(e){return '<th style="text-align:center'+(e.d===t?';color:var(--accent)':"")+'">'
@@ -1348,7 +1355,20 @@ function attTable(){
   h+='</tbody></table></div><div class="legend">'
     +["present","late","excused","sick","absent","none"].map(function(k){
       return '<span><span class="mk sm" data-s="'+k+'">'+ST[k].short+'</span>'+ST[k].ko+'</span>';}).join("")
-    +'<span style="margin-left:auto">출석률 = (출석 + 지각) / 체크된 회차 — <b style="color:var(--sick)">병결은 계산에서 제외</b></span></div></section>';
+    +'<span style="margin-left:auto">출석률 = (출석 + 지각) / 체크된 회차 — <b style="color:var(--sick)">병결은 계산에서 제외</b></span></div>';
+  if(editMode&&!readOnly){
+    var bl=backupList();
+    h+='<div class="frow"><label>로컬 백업</label>';
+    if(!bl.length){ h+='<span class="muted-s">이 브라우저에 저장된 백업이 없습니다. 페이지를 열 때마다 자동으로 쌓입니다.</span>'; }
+    else{
+      h+='<select class="f" id="bkSel" style="width:auto">'
+        + bl.map(function(b,i){ return '<option value="'+i+'">'+esc(bkLabel(b))+'</option>'; }).reverse().join("")
+        +'</select><button class="btn sm" id="bkBtn">이 백업으로 되돌리기</button>'
+        +'<span class="muted-s">되돌린 뒤 저장해야 서버에 반영됩니다</span>';
+    }
+    h+='</div>';
+  }
+  h+='</section>';
   return h;
 }
 
@@ -1472,6 +1492,12 @@ document.addEventListener("click",function(ev){
   if(ev.target.closest("#inBtn")){signIn();return;}
   if(ev.target.closest("#outBtn")){signOutNow();return;}
   if(ev.target.closest("#seedBtn")){seedUpload();return;}
+  if(ev.target.closest("#recBtn")){doRecover();return;}
+  if(ev.target.closest("#bkBtn")){
+    var sel=document.getElementById("bkSel");
+    if(sel) restoreBackup(+sel.value);
+    return;
+  }
   if(ev.target.closest("#addTeam")){addTeam();return;}
   if((el=ev.target.closest('[data-act="tdel"]'))){delTeam(el.getAttribute("data-id"));return;}
   if((el=ev.target.closest('[data-act="tout"]'))){teamOut(el.getAttribute("data-id"),el.getAttribute("data-m"));return;}
@@ -1896,8 +1922,70 @@ function todayTaskCard(){
   return h+'</div></section>';
 }
 
+
+/* ---------- 로컬 자동 백업 (이 브라우저에만 저장) ---------- */
+var BK="saa-backup";
+function backup(json){
+  try{
+    var arr=JSON.parse(localStorage.getItem(BK)||"[]");
+    if(arr.length && arr[arr.length-1].j===json) return;
+    arr.push({t:Date.now(), j:json});
+    while(arr.length>12) arr.shift();
+    localStorage.setItem(BK, JSON.stringify(arr));
+  }catch(e){}
+}
+function backupList(){ try{ return JSON.parse(localStorage.getItem(BK)||"[]"); }catch(e){ return []; } }
+function cellCount(json){
+  try{
+    var o=JSON.parse(json), n=0, d, m;
+    for(d in o.att) for(m in o.att[d]){ var v=o.att[d][m]; if(v&&v.s&&v.s!=="none") n++; }
+    return n;
+  }catch(e){ return 0; }
+}
+function bkLabel(b){
+  var dt=new Date(b.t);
+  return (dt.getMonth()+1)+"/"+dt.getDate()+" "+p2(dt.getHours())+":"+p2(dt.getMinutes())
+    +" · 기록 "+cellCount(b.j)+"개";
+}
+function restoreBackup(i){
+  var arr=backupList(); var b=arr[i]; if(!b) return;
+  try{
+    S=JSON.parse(b.j); normalize(); SCHED=applyOver();
+    if(idx(cur)<0) cur=pickDefaultDate();
+    mark("restore"); render();
+    toast(bkLabel(b)+" 백업을 불러왔습니다. 저장하기를 눌러야 서버에 반영됩니다.", 8000);
+  }catch(e){ toast("백업을 읽지 못했습니다."); }
+}
+
+/* ---------- 이전 상황판 기록 복구 (1회용) ---------- */
+function recoverDiff(){
+  var n=0, d, mid;
+  for(d in RECOVER){
+    for(mid in RECOVER[d]){
+      var have=(S.att[d]&&S.att[d][mid])||null, want=RECOVER[d][mid];
+      if(!have || have.s!==want.s || (have.m||"")!==(want.m||"")) n++;
+    }
+  }
+  return n;
+}
+function doRecover(){
+  var n=0, d, mid;
+  for(d in RECOVER){
+    if(!S.att[d]) S.att[d]={};
+    for(mid in RECOVER[d]){
+      var have=S.att[d][mid], want=RECOVER[d][mid];
+      if(!have || have.s!==want.s || (have.m||"")!==(want.m||"")){
+        S.att[d][mid]={s:want.s, m:want.m||""};
+        n++;
+      }
+    }
+  }
+  if(n){ mark("recover"); render(); toast(n+"개 기록을 복구했습니다. 저장하기를 눌러 확정하세요.", 7000); }
+  else { toast("복구할 기록이 없습니다. 이미 반영되어 있습니다."); }
+}
+
 /* ---------- Firebase 연동 ---------- */
-var db=null, auth=null, user=null, authReady=false, needSeed=false;
+var db=null, auth=null, user=null, authReady=false, needSeed=false, loaded=false;
 var syncSt="init", docRef=null;
 
 function syncTitle(){
@@ -1931,6 +2019,10 @@ function seedUpload(){
 function save(){
   if(syncSt==="noconf"){ toast("Firebase 설정이 아직 없습니다.", 6000); return; }
   if(!db||!user){ toast("조장 계정으로 로그인해야 저장할 수 있습니다."); return; }
+  if(!loaded && !needSeed){
+    toast("서버 기록을 아직 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.", 7000);
+    syncSaveBtn(); return;
+  }
   var btn=document.getElementById("saveBtn");
   if(btn){ btn.disabled=true; btn.textContent="저장 중…"; }
   syncSt="saving";
@@ -1968,13 +2060,23 @@ function initFirebase(){
 
   onSnapshot(docRef, function(snap){
     syncSt="live";
-    if(!snap.exists()){ needSeed=true; render(); return; }
+    if(!snap.exists()){ needSeed=true; loaded=true; render(); return; }
     needSeed=false;
-    if(dirty){ render(); return; }          /* 저장 안 한 로컬 변경은 덮어쓰지 않음 */
+    var first=!loaded;
+    /* 최초 로드는 무조건 서버본을 적용한다 — 시드 상태로 덮어쓰는 사고 방지 */
+    if(!first && dirty){ render(); return; }
     var d=snap.data();
     if(d && typeof d.json==="string"){
-      try{ S=JSON.parse(d.json); normalize(); SCHED=applyOver();
-           if(idx(cur)<0) cur=pickDefaultDate(); }catch(e){}
+      try{
+        S=JSON.parse(d.json); normalize(); SCHED=applyOver();
+        if(idx(cur)<0) cur=pickDefaultDate();
+        backup(d.json);
+        if(first && dirty){
+          dirty=false; changes={};
+          toast("서버 기록을 불러왔습니다. 불러오기 전에 입력하신 내용은 반영되지 않았습니다.", 8000);
+        }
+        loaded=true;
+      }catch(e){}
     }
     render();
   }, function(){ syncSt="offline"; render(); });
