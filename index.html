@@ -167,6 +167,10 @@ button{cursor:pointer;background:none;border:none;padding:0}
 .bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
 .mission{padding:15px 18px;font-size:14px;color:var(--ink2);line-height:1.6;border-bottom:1px solid var(--lineSoft)}
 .mission b{color:var(--ink);font-weight:600}
+.rule{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 18px;
+  background:var(--lateSoft);border-bottom:1px solid var(--lineSoft)}
+.rule b{font-size:14px;color:var(--late);font-weight:700;letter-spacing:-.01em}
+.rule-x{font-size:12.5px;color:var(--ink2)}
 
 .scroll{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:13.5px}
@@ -920,6 +924,17 @@ function normalize(){
   if(!S.over) S.over={};
   if(!S.members) S.members=[];
   S.members.forEach(function(m){ if(!m.regDays) m.regDays=[]; if(m.regReason==null) m.regReason=""; });
+  if(!S.meta) S.meta={};
+  if(!S.meta.v2){                       /* 시험 일정 재조정 — 1회만 적용 */
+    S.meta.examFrom="2026-10-07";
+    S.meta.examTo="2026-10-08";
+    S.meta.passRate=80;
+    S.meta.mission="AWS Certified Solutions Architect – Associate(SAA-C03) 취득. "
+                  +"불합격 인원 발생 시 재응시일까지 오답 리뷰·모의고사 점검 등 학습 지원을 지속함.";
+    S.meta.v2=1;
+  }
+  if(S.meta.passRate==null) S.meta.passRate=80;
+  if(S.meta.examTo==null) S.meta.examTo="";
   if(!S.teams) S.teams=[];
   if(!S.tasks) S.tasks=[];
   if(S.seqG==null) S.seqG=0;
@@ -1259,18 +1274,32 @@ function goalCard(){
   });
   var wkRate=tot?Math.round(ok/tot*100):null;
   var pLect=Math.round(lectDone/lect.length*100), pAll=Math.round(doneAll/sess.length*100);
+  var pr=(S.meta.passRate==null?80:S.meta.passRate);
+  var eFrom=S.meta.examFrom||"", eTo=S.meta.examTo||"";
+  var examSub=(eFrom?fmtShort(eFrom):"미정")+(eTo?" ~ "+fmtShort(eTo):"")+" 개별 응시";
   return '<section class="card"><div class="card-h"><h2>스터디 목표</h2></div>'
    +'<div class="mission"><b>전원 합격.</b> '+esc(S.meta.mission)+'</div>'
+   +'<div class="rule"><span class="lb2">응시 기준</span>'
+     +'<b>모의고사 정답률 '+pr+'% 이상</b>'
+     +'<span class="rule-x">미달 시 응시를 1~2주 순연합니다</span></div>'
    +'<div class="goals">'
      +'<div class="goal"><div class="k">시험 응시</div><div class="v">'+(dExam>0?"D-"+dExam:(dExam===0?"D-DAY":"응시 기간"))+'</div>'
-       +'<div class="sub">10/1 ~ 10/8 개별 응시</div></div>'
+       +'<div class="sub">'+esc(examSub)+'</div></div>'
      +'<div class="goal"><div class="k">강의 완강</div><div class="v">'+lectDone+'<small> / '+lect.length+'일</small></div>'
        +'<div class="bar"><i style="width:'+pLect+'%"></i></div></div>'
      +'<div class="goal"><div class="k">전체 일정</div><div class="v">'+pAll+'<small>%</small></div>'
        +'<div class="bar"><i style="width:'+pAll+'%"></i></div></div>'
      +'<div class="goal"><div class="k">이번 주 출석률</div><div class="v">'+(wkRate===null?"–":wkRate+'<small>%</small>')+'</div>'
        +'<div class="sub">'+(wkRate===null?"기록 없음":"지각 포함 참석 기준")+'</div></div>'
-   +'</div></section>';
+   +'</div>'
+   +((editMode&&!readOnly)
+      ? '<div class="frow"><label style="width:100%">시험 일정 · 응시 기준</label>'
+        +'<span class="assign"><b>시작</b><input class="f" type="date" id="exFrom" value="'+esc(eFrom)+'" style="width:auto"></span>'
+        +'<span class="assign"><b>종료</b><input class="f" type="date" id="exTo" value="'+esc(eTo)+'" style="width:auto"></span>'
+        +'<span class="assign"><b>기준</b><input class="f" type="number" id="exRate" min="0" max="100" value="'+pr+'" style="width:64px"> %</span>'
+        +'</div>'
+      : "")
+   +'</section>';
 }
 
 function weekCard(){
@@ -1562,6 +1591,12 @@ document.addEventListener("change",function(ev){
     setWho(ev.target.getAttribute("data-t"),ev.target.getAttribute("data-g"),
            ev.target.getAttribute("data-n"),ev.target.value);
     return;
+  }
+  if(ev.target.id==="exFrom"){ S.meta.examFrom=ev.target.value; mark("meta"); render(); return; }
+  if(ev.target.id==="exTo"){ S.meta.examTo=ev.target.value; mark("meta"); render(); return; }
+  if(ev.target.id==="exRate"){
+    var v=parseInt(ev.target.value,10); if(isNaN(v)) v=80;
+    S.meta.passRate=Math.max(0,Math.min(100,v)); mark("meta"); render(); return;
   }
   if(ev.target.id==="chgMember"){
     var nm=document.getElementById("chgName");
