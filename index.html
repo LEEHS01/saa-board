@@ -210,6 +210,33 @@ td.dcol{text-align:center;padding:6px}
 .alert.reg{background:var(--regSoft);color:var(--reg)}
 
 .sec{margin-top:20px}
+.col{display:flex;flex-direction:column;gap:20px}
+.endc{border-color:var(--accent)}
+.endc-in{padding:22px 24px}
+.endc-eye{font-size:11.5px;letter-spacing:.12em;color:var(--accent);font-family:var(--mono);font-weight:600}
+.endc h3{margin:8px 0 0;font-size:22px;font-weight:700;letter-spacing:-.02em}
+.endc p{margin:10px 0 0;font-size:14.5px;line-height:1.7;color:var(--ink2)}
+.endc-stats{display:flex;gap:1px;background:var(--line);border:1px solid var(--line);
+  border-radius:11px;overflow:hidden;margin-top:18px}
+.endc-stats div{flex:1;background:var(--surface);padding:12px 14px;text-align:center}
+.endc-stats b{display:block;font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-size:21px;font-weight:700;letter-spacing:-.02em}
+.endc-stats span{font-size:11.5px;color:var(--muted);letter-spacing:.04em}
+.ovl{position:fixed;inset:0;background:rgba(15,26,29,.55);display:flex;align-items:center;
+  justify-content:center;z-index:200;padding:22px}
+.ovl-box{background:var(--surface);border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 24px 60px -20px rgba(15,26,29,.5);padding:28px 30px;max-width:460px;width:100%;
+  display:flex;flex-direction:column;align-items:flex-start}
+.ovl-box h3{margin:8px 0 0;font-size:24px;font-weight:700;letter-spacing:-.02em}
+.ovl-box p{margin:12px 0 0;font-size:15px;line-height:1.7;color:var(--ink2)}
+.ovl-box .endc-stats{width:100%}
+.ovl-box .btn{margin-top:20px;align-self:stretch;justify-content:center;padding:10px}
+@media (prefers-reduced-motion:no-preference){
+  .ovl{animation:fade .18s ease-out}
+  .ovl-box{animation:pop .22s cubic-bezier(.2,.9,.3,1.2)}
+}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
 .sched-day{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500}
 tr.is-off td{color:var(--muted)}
 tr.is-today td{background:var(--accentSoft)}
@@ -929,6 +956,13 @@ function normalize(){
     S.meta.v2=1;
   }
   if(S.meta.passRate==null) S.meta.passRate=80;
+  if(!S.meta.notice){
+    S.meta.notice={
+      on:true, popup:true,
+      title:"1차 스터디 종료",
+      body:"오늘로 1차 스터디는 종료되었습니다.\n중간 프로젝트 이후 2차 스터디는 따로 모집하여 진행될 예정입니다.\n\n출석표와 일정표는 이 주소에서 계속 열람할 수 있습니다."
+    };
+  }
   if(S.meta.examTo==null) S.meta.examTo="";
   if(!S.teams) S.teams=[];
   if(!S.tasks) S.tasks=[];
@@ -1493,7 +1527,7 @@ function schedTable(){
 function render(){
   var h=topBar()+'<div class="wrap">';
   if(page==="dash"){
-    h+='<div class="grid-main"><div>'+todayCard()+'</div>'
+    h+='<div class="grid-main"><div class="col">'+todayCard()+endCard()+'</div>'
       +'<div class="rail">'+todayTaskCard()+noticeCard()+regCard()+goalCard()+'</div></div>'+weekCard();
   }else if(page==="task"){
     h+=teamCard()+taskSection();
@@ -1505,6 +1539,7 @@ function render(){
   document.getElementById("root").innerHTML=h;
   syncSaveBtn();
   stashUI();
+  maybePopup();
 }
 
 document.addEventListener("click",function(ev){
@@ -1575,7 +1610,9 @@ document.addEventListener("input",function(ev){
   var el=ev.target.closest('[data-act="memo"]');
   if(el){ setMemo(cur,el.getAttribute("data-id"),el.value); return; }
   el=ev.target.closest('[data-act="tname"]');
-  if(el){ var g=teamById(el.getAttribute("data-id")); if(g){ g.name=el.value; mark("team:"+g.id); syncSaveBtn(); } }
+  if(el){ var g=teamById(el.getAttribute("data-id")); if(g){ g.name=el.value; mark("team:"+g.id); syncSaveBtn(); } return; }
+  if(ev.target.id==="ncTitle"){ S.meta.notice.title=ev.target.value; mark("notice"); syncSaveBtn(); return; }
+  if(ev.target.id==="ncBody"){ S.meta.notice.body=ev.target.value; mark("notice"); syncSaveBtn(); return; }
 });
 document.addEventListener("change",function(ev){
   if(ev.target.matches('[data-act="tin"]')){
@@ -1587,6 +1624,8 @@ document.addEventListener("change",function(ev){
            ev.target.getAttribute("data-n"),ev.target.value);
     return;
   }
+  if(ev.target.id==="ncOn"){ S.meta.notice.on=ev.target.checked; mark("notice"); render(); return; }
+  if(ev.target.id==="ncPop"){ S.meta.notice.popup=ev.target.checked; mark("notice"); render(); return; }
   if(ev.target.id==="exFrom"){ S.meta.examFrom=ev.target.value; mark("meta"); render(); return; }
   if(ev.target.id==="exTo"){ S.meta.examTo=ev.target.value; mark("meta"); render(); return; }
   if(ev.target.id==="exRate"){
@@ -1952,6 +1991,81 @@ function todayTaskCard(){
   return h+'</div></section>';
 }
 
+
+/* ---------- 종료 안내 ---------- */
+function nlines(t){ return String(t||"").split("\n").map(esc).join("<br>"); }
+function finishStats(){
+  var sess=SCHED.filter(function(e){ return e.k!=="off"; });
+  var last=sess.length? sess[sess.length-1].d : "";
+  var first=sess.length? sess[0].d : "";
+  var rs=[], done=S.members.filter(function(m){ return !m.until; });
+  done.forEach(function(m){ var r=rateAll(m.id); if(r!==null) rs.push(r); });
+  var avg=rs.length? Math.round(rs.reduce(function(a,b){return a+b;},0)/rs.length) : null;
+  return {n:sess.length, first:first, last:last, people:done.length, avg:avg};
+}
+function endCard(){
+  var n=S.meta.notice;
+  if(!n || (!n.on && !(editMode&&!readOnly))) return "";
+  var f=finishStats();
+  var h='<section class="card endc">';
+  if(n.on){
+    h+='<div class="endc-in">'
+      +'<span class="endc-eye">'+esc(f.first?fmtShort(f.first):"")+' — '+esc(f.last?fmtShort(f.last):"")+'</span>'
+      +'<h3>'+esc(n.title||"")+'</h3>'
+      +'<p>'+nlines(n.body)+'</p>'
+      +'<div class="endc-stats">'
+        +'<div><b>'+f.n+'</b><span>총 회차</span></div>'
+        +'<div><b>'+f.people+'</b><span>완주 인원</span></div>'
+        +'<div><b>'+(f.avg===null?"–":f.avg+"%")+'</b><span>평균 출석률</span></div>'
+      +'</div></div>';
+  }
+  if(editMode&&!readOnly){
+    h+='<div class="frow"><label style="width:100%">종료 안내 설정</label>'
+      +'<span class="assign"><b>화면 표시</b><input type="checkbox" id="ncOn"'+(n.on?" checked":"")+'></span>'
+      +'<span class="assign"><b>첫 방문 팝업</b><input type="checkbox" id="ncPop"'+(n.popup?" checked":"")+'></span>'
+      +'<input class="f" id="ncTitle" value="'+esc(n.title||"")+'" placeholder="제목">'
+      +'<textarea class="f" id="ncBody" rows="2" placeholder="내용 — 줄바꿈 가능">'+esc(n.body||"")+'</textarea>'
+      +'</div>';
+  }
+  return h+'</section>';
+}
+function noticeKey(){
+  var n=S.meta.notice||{}, src=(n.title||"")+"|"+(n.body||"");
+  var hsh=0,i;
+  for(i=0;i<src.length;i++){ hsh=((hsh<<5)-hsh+src.charCodeAt(i))|0; }
+  return "saa-notice-"+hsh;
+}
+var popupDone=false;
+function maybePopup(){
+  if(popupDone) return;
+  var n=S.meta.notice;
+  if(!n||!n.on||!n.popup) return;
+  if(!loaded && syncSt!=="noconf") return;      /* 서버 데이터 받은 뒤에 띄운다 */
+  popupDone=true;
+  try{ if(localStorage.getItem(noticeKey())) return; }catch(e){}
+  var f=finishStats();
+  var ov=document.createElement("div");
+  ov.className="ovl"; ov.id="noticeOvl";
+  ov.innerHTML='<div class="ovl-box" role="dialog" aria-modal="true" aria-labelledby="ovlT">'
+    +'<span class="endc-eye">'+esc(f.first?fmtShort(f.first):"")+' — '+esc(f.last?fmtShort(f.last):"")+'</span>'
+    +'<h3 id="ovlT">'+esc(n.title||"")+'</h3>'
+    +'<p>'+nlines(n.body)+'</p>'
+    +'<div class="endc-stats">'
+      +'<div><b>'+f.n+'</b><span>총 회차</span></div>'
+      +'<div><b>'+f.people+'</b><span>완주 인원</span></div>'
+      +'<div><b>'+(f.avg===null?"–":f.avg+"%")+'</b><span>평균 출석률</span></div>'
+    +'</div>'
+    +'<button class="btn save" id="ovlClose">확인</button></div>';
+  document.body.appendChild(ov);
+  function close(){
+    try{ localStorage.setItem(noticeKey(),"1"); }catch(e){}
+    if(ov.parentNode) ov.remove();
+    document.removeEventListener("keydown", onKey);
+  }
+  function onKey(e){ if(e.key==="Escape") close(); }
+  ov.addEventListener("click", function(e){ if(e.target===ov||e.target.id==="ovlClose") close(); });
+  document.addEventListener("keydown", onKey);
+}
 
 /* ---------- 로컬 자동 백업 (이 브라우저에만 저장) ---------- */
 var BK="saa-backup";
